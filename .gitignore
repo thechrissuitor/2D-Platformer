@@ -1,0 +1,9 @@
+Library/
+Logs/
+obj/
+Packages/
+ProjectSettings/
+Temp/
+"2d Platformer.sln"
+Assembly-CSharp.csproj
+Assembly-CSharp-Editor.csproj
