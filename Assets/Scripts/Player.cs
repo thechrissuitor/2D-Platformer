@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
         // have the sprite facing the correct direction.
         // then run/stop running animation.
         bool isRunningCheck = Mathf.Abs(playerRigidbody.velocity.x) > Mathf.Epsilon;
-        if(isRunningCheck)
+        if (isRunningCheck)
         {
             transform.localScale = new Vector2(Mathf.Sign(playerRigidbody.velocity.x), 1f);
         }
@@ -46,34 +46,33 @@ public class Player : MonoBehaviour
 
         // set the double jump flag to true while the player is touching the floor.
         // this way the player can jump if they simply walk off an edge
-        if(feet.IsTouchingLayers(LayerMask.GetMask("Foreground"))){
+        if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
+        {
             canDoubleJump = true;
         }
 
-        Debug.Log("Player y-velocity magnitude = " + playerRigidbody.velocity.y);
-
         // if the jump button(s) is pressed,
         // then jump, double jump, or do neither.
-        if (Input.GetAxisRaw("Vertical") != 0)
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             // if the player is touching the ground and there is no vertical movement,
             // jump.
             // raise flag to signal double jump is ready.
-            if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && playerRigidbody.velocity.y < 3)
+            if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
             {
 
                 canDoubleJump = true;
                 Vector2 jumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
                 playerRigidbody.AddForce(jumpVelocity, ForceMode2D.Impulse);
 
-                
                 Debug.Log("jump");
             }
             // if the player is not touching the ground, and the double jump flag is raised,
             // double jump.
             // lower double jump flag.
-            else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true)
+            else if (canDoubleJump == true)
             {
+                Debug.Log("double jump");
                 playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical movement to counter gravity
                 Vector2 doubleJumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
                 playerRigidbody.AddForce(doubleJumpVelocity, ForceMode2D.Impulse);
