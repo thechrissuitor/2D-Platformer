@@ -51,26 +51,22 @@ public class Player : MonoBehaviour
             canDoubleJump = true;
         }
 
-        // if the jump button(s) is pressed,
-        // then jump, double jump, or do neither.
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        // jump block
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
-            // if the player is touching the ground and there is no vertical movement,
-            // jump.
-            // raise flag to signal double jump is ready.
+            // jump
             if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
             {
 
                 canDoubleJump = true;
+                playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical
                 Vector2 jumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
                 playerRigidbody.AddForce(jumpVelocity, ForceMode2D.Impulse);
 
                 Debug.Log("jump");
             }
-            // if the player is not touching the ground, and the double jump flag is raised,
-            // double jump.
-            // lower double jump flag.
-            else if (canDoubleJump == true)
+            // double jump
+            else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
             {
                 Debug.Log("double jump");
                 playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical movement to counter gravity
