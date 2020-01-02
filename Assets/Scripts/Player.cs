@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
         {
             playerAnimator.SetTrigger("isDying");
             playerRigidbody.velocity = dyingVector;
+            FindObjectOfType<GameController>().playerDeath();
         }
     }
 

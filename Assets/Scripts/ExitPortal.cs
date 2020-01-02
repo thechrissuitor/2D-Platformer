@@ -14,10 +14,10 @@ public class ExitPortal : MonoBehaviour
 
     IEnumerator loadNextScene()
     {
-        yield return new WaitForSecondsRealtime(loadTime);
-
         var currScene = SceneManager.GetActiveScene();
         int currBuildIndex = currScene.buildIndex;
         SceneManager.LoadScene(currBuildIndex + 1);
+
+        yield return new WaitForSecondsRealtime(loadTime);
     }
 }

@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
+    [SerializeField] int playerLives = 3;
+    [SerializeField] float bufferTime = 0.5f;
+
     private void Awake()
     {
         // establish singleton
@@ -17,15 +21,35 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
+    // call this public method when handling the player's death
+    public void playerDeath()
     {
-        
+        if(playerLives > 1)
+        {
+            StartCoroutine("Killed");
+        }
+        else
+        {
+            StartCoroutine("restartGame");
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    // This method processes the player's death while they still have more lives
+    IEnumerator Killed()
     {
-        
+        playerLives = playerLives - 1;
+        var currScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currScene.buildIndex);
+
+        yield return new WaitForSecondsRealtime(bufferTime);
+    }
+
+    // This method processes the player's death while they do not have any more lives
+    IEnumerator restartGame()
+    {
+        SceneManager.LoadScene(0);
+        Destroy(gameObject);
+
+        yield return new WaitForSecondsRealtime(bufferTime);
     }
 }
