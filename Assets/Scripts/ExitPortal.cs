@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class ExitPortal : MonoBehaviour
 {
     [SerializeField] float loadTime = 3f;
+    [SerializeField] float slowMoFactor = 0.5f;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -14,10 +15,14 @@ public class ExitPortal : MonoBehaviour
 
     IEnumerator loadNextScene()
     {
+        Time.timeScale = slowMoFactor;
+
+        yield return new WaitForSecondsRealtime(loadTime);
+
         var currScene = SceneManager.GetActiveScene();
         int currBuildIndex = currScene.buildIndex;
         SceneManager.LoadScene(currBuildIndex + 1);
 
-        yield return new WaitForSecondsRealtime(loadTime);
+        Time.timeScale = 1f;
     }
 }

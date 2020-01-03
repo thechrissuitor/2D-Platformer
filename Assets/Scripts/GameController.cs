@@ -39,17 +39,18 @@ public class GameController : MonoBehaviour
     {
         playerLives = playerLives - 1;
         var currScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currScene.buildIndex);
 
         yield return new WaitForSecondsRealtime(bufferTime);
+
+        SceneManager.LoadScene(currScene.buildIndex);
     }
 
     // This method processes the player's death while they do not have any more lives
     IEnumerator restartGame()
     {
+        yield return new WaitForSecondsRealtime(bufferTime);
+
         SceneManager.LoadScene(0);
         Destroy(gameObject);
-
-        yield return new WaitForSecondsRealtime(bufferTime);
     }
 }
