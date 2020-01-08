@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField] float moveSpeed = 1;
+    [SerializeField] float climbSpeed = 0.5f;
     [SerializeField] float jumpHeight = 1;
     [SerializeField] Vector2 dyingVector = new Vector2(2f, 2f);
     Animator playerAnimator;
@@ -13,6 +14,8 @@ public class Player : MonoBehaviour
     CapsuleCollider2D playerCollider;
     BoxCollider2D feet;
 
+    private float orgGravScal;
+    
     bool canDoubleJump = true;
     bool isAlive;
     int count = 0;
@@ -25,6 +28,7 @@ public class Player : MonoBehaviour
         playerCollider = GetComponent<CapsuleCollider2D>();
         feet = GetComponent<BoxCollider2D>();
         isAlive = true;
+        orgGravScal = playerRigidbody.gravityScale;
     }
 
     // Update is called once per frame
@@ -64,36 +68,70 @@ public class Player : MonoBehaviour
         }
         playerAnimator.SetBool("isRunning", isRunningCheck);
 
-        // set the double jump flag to true while the player is touching the floor.
-        // this way the player can jump if they simply walk off an edge
-        if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
-        {
-            canDoubleJump = true;
-        }
+        climb();
+        jump();
+    }
 
-        // jump block
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+    // Player jumping logic
+    private void jump()
+    {
+        if (!playerCollider.IsTouchingLayers(LayerMask.GetMask("Climbing")))
         {
-            // jump
+            // set the double jump flag to true while the player is touching the floor.
+            // this way the player can jump if they simply walk off an edge
             if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
             {
-
                 canDoubleJump = true;
-                playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical
-                Vector2 jumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
-                playerRigidbody.AddForce(jumpVelocity, ForceMode2D.Impulse);
-
-                Debug.Log("jump");
             }
-            // double jump
-            else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
+
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
             {
-                Debug.Log("double jump");
-                playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical movement to counter gravity
-                Vector2 doubleJumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
-                playerRigidbody.AddForce(doubleJumpVelocity, ForceMode2D.Impulse);
-                canDoubleJump = false;
+                // jump
+                if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
+                {
+
+                    canDoubleJump = true;
+                    playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical
+                    Vector2 jumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
+                    playerRigidbody.AddForce(jumpVelocity, ForceMode2D.Impulse);
+
+                    Debug.Log("jump");
+                }
+                // double jump
+                else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
+                {
+                    Debug.Log("double jump");
+                    playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical movement to counter gravity
+                    Vector2 doubleJumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
+                    playerRigidbody.AddForce(doubleJumpVelocity, ForceMode2D.Impulse);
+                    canDoubleJump = false;
+                }
             }
         }
     }
+
+    // player climbing logic
+    private void climb()
+    {
+        if (playerCollider.IsTouchingLayers(LayerMask.GetMask("Climbing")))
+        {
+            playerRigidbody.gravityScale = 0; // no gravity should be affecting the player while on a ladder
+            if (Input.GetAxisRaw("Vertical") != 0) // if the player is trying to go up or down
+            {
+                Vector2 climbVector = new Vector2(playerRigidbody.velocity.x, Input.GetAxisRaw("Vertical") * climbSpeed);
+                playerRigidbody.velocity = climbVector;
+                playerAnimator.SetBool("isClimbing", true);
+            } else
+            {
+                Vector2 idleVector = new Vector2(playerRigidbody.velocity.x, 0f);
+                playerRigidbody.velocity = idleVector;
+                playerAnimator.SetBool("isClimbing", false);
+            }
+        }
+        else
+        {
+            playerRigidbody.gravityScale = orgGravScal;
+        }
+    }
+
 }

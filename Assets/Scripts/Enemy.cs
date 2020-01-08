@@ -6,12 +6,14 @@ public class Enemy : MonoBehaviour
 {
 
     Rigidbody2D enemyRigidbody;
+    Collider2D enemyCollider;
     [SerializeField] float moveSpeed = 1f;
 
     // Start is called before the first frame update
     void Start()
     {
         enemyRigidbody = GetComponent<Rigidbody2D>();
+        enemyCollider = GetComponent<Collider2D>();
     }
 
     // Update is called once per frame
@@ -34,6 +36,9 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        transform.localScale = new Vector2(-(Mathf.Sign(enemyRigidbody.velocity.x)), 1f);
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Foreground"))
+        {
+            transform.localScale = new Vector2(-(Mathf.Sign(enemyRigidbody.velocity.x)), 1f);
+        }
     }
 }
