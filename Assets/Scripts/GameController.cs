@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour
     [SerializeField] int playerLives = 3;
     [SerializeField] float bufferTime = 0.5f;
 
+    [SerializeField] AudioClip backgroundMusic;
+
     private void Awake()
     {
         // establish singleton
@@ -19,6 +21,16 @@ public class GameController : MonoBehaviour
         {
             DontDestroyOnLoad(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        
+    }
+
+    private void PlayBackgroundMusic()
+    {
+        AudioSource.PlayClipAtPoint(backgroundMusic, transform.position);
     }
 
     // call this public method when handling the player's death

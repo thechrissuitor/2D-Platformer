@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
 
     private void death()
     {
-        if (playerCollider.IsTouchingLayers(LayerMask.GetMask("Enemy")))
+        if (playerCollider.IsTouchingLayers(LayerMask.GetMask("Enemy", "Obstacles")))
         {
             isAlive = false;
         }
@@ -94,13 +94,10 @@ public class Player : MonoBehaviour
                     playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical
                     Vector2 jumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
                     playerRigidbody.AddForce(jumpVelocity, ForceMode2D.Impulse);
-
-                    Debug.Log("jump");
                 }
                 // double jump
                 else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
                 {
-                    Debug.Log("double jump");
                     playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical movement to counter gravity
                     Vector2 doubleJumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
                     playerRigidbody.AddForce(doubleJumpVelocity, ForceMode2D.Impulse);
@@ -120,8 +117,16 @@ public class Player : MonoBehaviour
             {
                 Vector2 climbVector = new Vector2(playerRigidbody.velocity.x, Input.GetAxisRaw("Vertical") * climbSpeed);
                 playerRigidbody.velocity = climbVector;
+
+                // stop the running animation
+                if(playerAnimator.GetBool("isRunning") == true)
+                {
+                    playerAnimator.SetBool("isRunning", false);
+                }
+
                 playerAnimator.SetBool("isClimbing", true);
-            } else
+            }
+            else
             {
                 Vector2 idleVector = new Vector2(playerRigidbody.velocity.x, 0f);
                 playerRigidbody.velocity = idleVector;
@@ -131,6 +136,7 @@ public class Player : MonoBehaviour
         else
         {
             playerRigidbody.gravityScale = orgGravScal;
+            playerAnimator.SetBool("isClimbing", false);
         }
     }
 
