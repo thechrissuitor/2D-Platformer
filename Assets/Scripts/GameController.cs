@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,6 +9,10 @@ public class GameController : MonoBehaviour
     [SerializeField] float bufferTime = 0.5f;
 
     [SerializeField] AudioClip backgroundMusic;
+
+    Button restartButton;
+    Text canvasText;
+    int coins = 000;
 
     private void Awake()
     {
@@ -25,12 +29,42 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        
+        canvasText = FindObjectOfType<Text>();
+        canvasText.text = coins.ToString("000");
+        DontDestroyOnLoad(FindObjectOfType<Canvas>());
+
+    }
+
+    private void Update()
+    {
+        if(SceneManager.GetActiveScene() == SceneManager.GetSceneByName("Game Over"))
+        {
+            restartButton = FindObjectOfType<Button>();
+        }
+
+        // this block causes an error
+        if (FindObjectsOfType<Canvas>().Length > 1)
+        {
+            Destroy(FindObjectOfType<Canvas>());
+        }
+        else
+        {
+            DontDestroyOnLoad(FindObjectOfType<Canvas>());
+        }
+        // ~~~
+
+        canvasText.text = coins.ToString("000");
     }
 
     private void PlayBackgroundMusic()
     {
         AudioSource.PlayClipAtPoint(backgroundMusic, transform.position);
+    }
+
+    public void CoinCollection()
+    {
+        coins++;
+        canvasText.text = coins.ToString("000");
     }
 
     // call this public method when handling the player's death
@@ -50,6 +84,7 @@ public class GameController : MonoBehaviour
     IEnumerator Killed()
     {
         playerLives = playerLives - 1;
+        coins = 0;
         var currScene = SceneManager.GetActiveScene();
 
         yield return new WaitForSecondsRealtime(bufferTime);
@@ -62,7 +97,7 @@ public class GameController : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(bufferTime);
 
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Game Over");
         Destroy(gameObject);
     }
 }
