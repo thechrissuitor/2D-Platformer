@@ -8,11 +8,13 @@ public class GameController : MonoBehaviour
     [SerializeField] int playerLives = 3;
     [SerializeField] float bufferTime = 0.5f;
 
-    [SerializeField] AudioClip backgroundMusic;
+    [SerializeField] Text score;
+    [SerializeField] Text livesText;
+    [SerializeField] Image coinLogo;
 
     Button restartButton;
-    Text canvasText;
     int coins = 000;
+    int coinsPerLastLevel = 0;
 
     private void Awake()
     {
@@ -29,10 +31,8 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        canvasText = FindObjectOfType<Text>();
-        canvasText.text = coins.ToString("000");
-        DontDestroyOnLoad(FindObjectOfType<Canvas>());
-
+        score.text = coins.ToString("000");
+        livesText.text = "x " + playerLives.ToString();
     }
 
     private void Update()
@@ -41,30 +41,18 @@ public class GameController : MonoBehaviour
         {
             restartButton = FindObjectOfType<Button>();
         }
-
-        // this block causes an error
-        if (FindObjectsOfType<Canvas>().Length > 1)
-        {
-            Destroy(FindObjectOfType<Canvas>());
-        }
-        else
-        {
-            DontDestroyOnLoad(FindObjectOfType<Canvas>());
-        }
-        // ~~~
-
-        canvasText.text = coins.ToString("000");
-    }
-
-    private void PlayBackgroundMusic()
-    {
-        AudioSource.PlayClipAtPoint(backgroundMusic, transform.position);
+        score.text = coins.ToString("000");
     }
 
     public void CoinCollection()
     {
         coins++;
-        canvasText.text = coins.ToString("000");
+        score.text = coins.ToString("000");
+    }
+
+    public void SaveScoreOnLoad()
+    {
+        coinsPerLastLevel = coins;
     }
 
     // call this public method when handling the player's death
@@ -84,7 +72,9 @@ public class GameController : MonoBehaviour
     IEnumerator Killed()
     {
         playerLives = playerLives - 1;
-        coins = 0;
+        livesText.text = "x " + playerLives.ToString();
+        coins = coinsPerLastLevel;
+
         var currScene = SceneManager.GetActiveScene();
 
         yield return new WaitForSecondsRealtime(bufferTime);
@@ -95,9 +85,11 @@ public class GameController : MonoBehaviour
     // This method processes the player's death while they do not have any more lives
     IEnumerator restartGame()
     {
+        playerLives = playerLives - 1;
+        livesText.text = "x " + playerLives.ToString();
+
         yield return new WaitForSecondsRealtime(bufferTime);
 
         SceneManager.LoadScene("Game Over");
-        Destroy(gameObject);
     }
 }

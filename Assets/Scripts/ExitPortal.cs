@@ -21,6 +21,7 @@ public class ExitPortal : MonoBehaviour
 
         var currScene = SceneManager.GetActiveScene();
         int currBuildIndex = currScene.buildIndex;
+        FindObjectOfType<GameController>().SaveScoreOnLoad();
         SceneManager.LoadScene(currBuildIndex + 1);
 
         Time.timeScale = 1f;

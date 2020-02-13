@@ -77,6 +77,7 @@ public class Player : MonoBehaviour
     {
         if (!playerCollider.IsTouchingLayers(LayerMask.GetMask("Climbing")))
         {
+
             // set the double jump flag to true while the player is touching the floor.
             // this way the player can jump if they simply walk off an edge
             if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
@@ -89,14 +90,13 @@ public class Player : MonoBehaviour
                 // jump
                 if (feet.IsTouchingLayers(LayerMask.GetMask("Foreground")))
                 {
-
                     canDoubleJump = true;
                     playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical
                     Vector2 jumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
                     playerRigidbody.AddForce(jumpVelocity, ForceMode2D.Impulse);
                 }
                 // double jump
-                else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
+                else if (!feet.IsTouchingLayers(LayerMask.GetMask("Foreground")) && canDoubleJump == true && ( Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W) ))
                 {
                     playerRigidbody.velocity = new Vector2(playerRigidbody.velocity.x, 0f); // stop vertical movement to counter gravity
                     Vector2 doubleJumpVelocity = new Vector2(0f, Input.GetAxisRaw("Vertical") * jumpHeight);
@@ -142,7 +142,7 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Coins")
+        if(playerCollider.IsTouching(collision) && collision.tag == "Coins")
         {
             Destroy(collision.gameObject);
             FindObjectOfType<GameController>().CoinCollection();

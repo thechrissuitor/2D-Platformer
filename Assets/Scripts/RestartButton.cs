@@ -16,6 +16,7 @@ public class RestartButton : MonoBehaviour
 
     private void OnTaskClick()
     {
+        Destroy(FindObjectOfType<GameController>().gameObject);
         SceneManager.LoadScene(0);
     }
 }
